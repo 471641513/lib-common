@@ -3,11 +3,12 @@ package clients
 import (
 	"context"
 	"fmt"
-	"lib-common/local_context"
-	"lib-common/metrics"
-	"github.com/opay-org/lib-common/xlog"
 	"math/rand"
 	"time"
+
+	"github.com/opay-org/lib-common/local_context"
+	"github.com/opay-org/lib-common/metrics"
+	"github.com/opay-org/lib-common/xlog"
 
 	"google.golang.org/grpc"
 
