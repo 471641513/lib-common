@@ -1,0 +1,19 @@
+syntax = "proto3";
+package test_proto;
+
+
+message Req {
+    int64 id = 1;
+}
+
+message Rsp {
+    // response code
+    int64 code = 1;
+    // response message
+    string message = 2;
+
+}
+
+service TestStub {
+    rpc AddLocs (Req) returns (Rsp);
+}
