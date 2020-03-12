@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"lib-common/xlog"
+	"github.com/opay-org/lib-common/xlog"
 	"testing"
 	"time"
 )
