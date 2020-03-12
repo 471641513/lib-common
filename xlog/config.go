@@ -7,11 +7,13 @@ import (
 )
 
 type ConfFileWriter struct {
-	On              bool   `json:"On"`
-	LogPath         string `json:"LogPath"`
-	RotateLogPath   string `json:"RotateLogPath"`
-	WfLogPath       string `json:"WfLogPath"`
-	RotateWfLogPath string `json:"RotateWfLogPath"`
+	On                  bool   `json:"On"`
+	LogPath             string `json:"LogPath"`
+	RotateLogPath       string `json:"RotateLogPath"`
+	WfLogPath           string `json:"WfLogPath"`
+	RotateWfLogPath     string `json:"RotateWfLogPath"`
+	PublicLogPath       string `json:"PublicLogPath"`
+	RotatePublicLogPath string `json:"RotatePublicLogPath"`
 }
 
 type ConfConsoleWriter struct {
@@ -27,6 +29,7 @@ type LogConfig struct {
 
 func SetupLogDefault() {
 	var lc LogConfig
+	lc.Level = "DEBUG"
 	lc.CW = ConfConsoleWriter{
 		On:    true,
 		Color: true,
@@ -53,9 +56,9 @@ func SetupLogWithConf(lc LogConfig) (err error) {
 			w.SetPathPattern(lc.FW.RotateLogPath)
 			w.SetLogLevelFloor(TRACE)
 			if len(lc.FW.WfLogPath) > 0 {
-				w.SetLogLevelCeil(INFO)
+				w.SetLogLevelCeil(PUBLIC)
 			} else {
-				w.SetLogLevelCeil(ERROR)
+				w.SetLogLevelCeil(FATAL)
 			}
 			Register(w)
 		}
@@ -65,8 +68,17 @@ func SetupLogWithConf(lc LogConfig) (err error) {
 			wfw.SetFileName(lc.FW.WfLogPath)
 			wfw.SetPathPattern(lc.FW.RotateWfLogPath)
 			wfw.SetLogLevelFloor(WARNING)
-			wfw.SetLogLevelCeil(ERROR)
+			wfw.SetLogLevelCeil(FATAL)
 			Register(wfw)
+		}
+
+		if len(lc.FW.PublicLogPath) > 0 {
+			wfp := NewFileWriter()
+			wfp.SetFileName(lc.FW.PublicLogPath)
+			wfp.SetPathPattern(lc.FW.RotatePublicLogPath)
+			wfp.SetLogLevelFloor(PUBLIC)
+			wfp.SetLogLevelCeil(PUBLIC)
+			Register(wfp)
 		}
 	}
 

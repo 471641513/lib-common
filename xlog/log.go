@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	LEVEL_FLAGS = [...]string{"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+	LEVEL_FLAGS = [...]string{"TRACE", "DEBUG", "INFO", "PUBLIC", "WARN", "ERROR", "FATAL"}
 	recordPool  *sync.Pool
 )
 
@@ -19,6 +19,7 @@ const (
 	TRACE = iota
 	DEBUG
 	INFO
+	PUBLIC
 	WARNING
 	ERROR
 	FATAL
@@ -265,6 +266,10 @@ func Error(fmt string, args ...interface{}) {
 
 func Fatal(fmt string, args ...interface{}) {
 	logger_default.deliverRecordToWriter(FATAL, fmt, args...)
+}
+
+func Public(fmt string, args ...interface{}) {
+	logger_default.deliverRecordToWriter(PUBLIC, fmt, args...)
 }
 
 func Register(w Writer) {
