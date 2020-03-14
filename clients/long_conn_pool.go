@@ -135,7 +135,7 @@ func (pool *GrpcClientPool) balanceWorker() {
 			xlog.Debug("lconns to recycle=%v", len(connToRecycle))
 			//close long conns to do recycle from last round
 			for _, lconn := range connToRecycle {
-				if lconn.conn != nil {
+				if lconn != nil && lconn.conn != nil {
 					_ = lconn.conn.Close()
 					pool.debugConn("close", lconn.conn)
 				}
@@ -150,10 +150,16 @@ func (pool *GrpcClientPool) balanceWorker() {
 func (pool *GrpcClientPool) checkLongConns() (connToRecycle []*longConn) {
 	nowTs := time.Now().Unix()
 	idxToReconnect := map[*longConn]int{}
+	idxToNewConnect := []int{}
 	connSlice := longConnSlice{}
 	healthCountMap := map[int]int64{}
 
 	for idx, lconn := range pool.conns {
+		if lconn == nil || lconn.addrStat == nil {
+			xlog.Warn("idx=%v||lconn nil or addrStat nil||lconn=%+v", idx, lconn)
+			idxToNewConnect = append(idxToNewConnect, idx)
+			continue
+		}
 		if _, ok := healthCountMap[lconn.addrStat.idx]; ok {
 			healthCountMap[lconn.addrStat.idx] += 1
 		} else {
@@ -198,10 +204,20 @@ func (pool *GrpcClientPool) checkLongConns() (connToRecycle []*longConn) {
 
 	newConns := map[int]*longConn{}
 
+	for _, idx := range idxToNewConnect {
+		lconn, err := pool.connect(0)
+		if err != nil {
+			xlog.Error("failed to connect||err=%v", err)
+			continue
+		}
+		newConns[idx] = lconn
+	}
+
 	for _, oldConn := range connSlice {
 		idx := idxToReconnect[oldConn]
 		lconn, err := pool.connect(0)
 		if err != nil {
+			xlog.Error("failed to reConnect||err=%v", err)
 			continue
 		}
 		newConns[idx] = lconn
