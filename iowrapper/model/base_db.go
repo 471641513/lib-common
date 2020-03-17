@@ -19,11 +19,16 @@ type DbConfig struct {
 	Charset  string `toml:"charset"`
 	Database string `toml:"database"`
 	Debug    bool   `toml:"debug"`
+	TimeZone string `toml:"time_zone"`
 }
 
 func (c *DbConfig) GetDsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local&timeout=10s",
+	if c.TimeZone == ""{
+		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local&timeout=10s",
 		c.User, c.Password, c.Host, c.Port, c.Database, c.Charset)
+	}
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=%s&timeout=10s",
+		c.User, c.Password, c.Host, c.Port, c.Database, c.Charset,c.TimeZone)
 }
 
 type Logger struct {
