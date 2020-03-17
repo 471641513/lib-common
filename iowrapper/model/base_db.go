@@ -2,9 +2,10 @@ package model
 
 import (
 	"fmt"
-	"github.com/opay-org/lib-common/xlog"
 	"strings"
 	"time"
+
+	"github.com/opay-org/lib-common/xlog"
 
 	"github.com/jinzhu/gorm"
 
@@ -19,16 +20,12 @@ type DbConfig struct {
 	Charset  string `toml:"charset"`
 	Database string `toml:"database"`
 	Debug    bool   `toml:"debug"`
-	TimeZone string `toml:"time_zone"`
 }
 
 func (c *DbConfig) GetDsn() string {
-	if c.TimeZone == ""{
-		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local&timeout=10s",
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local&timeout=10s",
 		c.User, c.Password, c.Host, c.Port, c.Database, c.Charset)
-	}
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=%s&timeout=10s",
-		c.User, c.Password, c.Host, c.Port, c.Database, c.Charset,c.TimeZone)
+
 }
 
 type Logger struct {
@@ -56,7 +53,9 @@ func (l *Logger) Print(values ...interface{}) {
 }
 
 func NewGorm(config DbConfig) (orm *gorm.DB, err error) {
-	orm, err = gorm.Open("mysql", config.GetDsn())
+	dns := config.GetDsn()
+	xlog.Info("dns=%v", dns)
+	orm, err = gorm.Open("mysql", dns)
 	if err != nil {
 		return
 	}

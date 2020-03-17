@@ -19,7 +19,6 @@ func TestNewGorm(t *testing.T) {
 		Database: "oexpress_data",
 		Debug:    true,
 		Charset:  "utf8",
-		TimeZone: "UTC",
 	}
 	db, err := NewGorm(conf)
 	if err != nil {
@@ -27,6 +26,7 @@ func TestNewGorm(t *testing.T) {
 		return
 	}
 	xlog.Info("db=%+v||err=%+v", db, err)
+	db.Exec("set time_zone = '+00:00'")
 	rows, err := db.Raw("show variables like 'time_zone'").Rows()
 	if err != nil {
 		xlog.Error("err=%v", err)
