@@ -27,7 +27,7 @@ func TestNewGorm(t *testing.T) {
 	}
 	xlog.Info("db=%+v||err=%+v", db, err)
 	db.Exec("set time_zone = '+00:00'")
-	rows, err := db.Raw("show variables like 'time_zone'").Rows()
+	rows, err := db.Raw("show variables like '%time_zone%'").Rows()
 	if err != nil {
 		xlog.Error("err=%v", err)
 		return
