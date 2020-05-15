@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/opay-org/lib-common/xlog"
 	"math"
 	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/opay-org/lib-common/xlog"
 
 	"github.com/smallnest/weighted"
 
@@ -111,7 +112,7 @@ func NewGrpcClientPool(conf GrpcClientConfig) (pool *GrpcClientPool, err error) 
 		pool.connStats[idx] = stat
 	}
 
-	xlog.Info("addr_stat=%+v", pool.connStats)
+	//xlog.Info("addr_stat=%+v", pool.connStats)
 
 	pool.ctx, pool.cancel = context.WithCancel(context.Background())
 	err = pool.init()
@@ -172,7 +173,7 @@ func (pool *GrpcClientPool) checkLongConns() (connToRecycle []*longConn) {
 		}
 	}
 
-	xlog.Info("[%v]||healthCountMap=%v", pool.conf.Addrs[0], healthCountMap)
+	//xlog.Info("[%v]||healthCountMap=%v", pool.conf.Addrs[0], healthCountMap)
 	// check health conn count
 	for addIdx, stat := range pool.connStats {
 		if *(stat.loadScore) < UNHEALTH_LOAD_SCORE {
