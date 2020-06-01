@@ -4,12 +4,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/opay-org/lib-common/xlog"
 	"math"
 	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/opay-org/lib-common/xlog"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -121,6 +122,10 @@ func MustBytes(data interface{}) (bytes []byte) {
 	return bytes
 }
 
+const (
+	epsilon = 0.00001
+)
+
 func EarthDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	radius := float64(6371000) // 6378137
 	rad := math.Pi / 180.0
@@ -131,6 +136,11 @@ func EarthDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	lng2 = lng2 * rad
 
 	theta := lng2 - lng1
+
+	if math.Abs(theta) < epsilon && math.Abs(lat2-lat1) < epsilon {
+		return 0
+	}
+
 	dist := math.Acos(math.Sin(lat1)*math.Sin(lat2) + math.Cos(lat1)*math.Cos(lat2)*math.Cos(theta))
 
 	return dist * radius
