@@ -10,13 +10,14 @@ import (
 	"sync/atomic"
 	"time"
 
+	"google.golang.org/grpc/keepalive"
+
 	"github.com/opay-org/lib-common/xlog"
 
 	"github.com/smallnest/weighted"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
-	"google.golang.org/grpc/keepalive"
 )
 
 /*
@@ -86,9 +87,11 @@ type GrpcClientPool struct {
 	w        *weighted.SW
 
 	connStats []*addrStats
+
+	dialOpts []grpc.DialOption
 }
 
-func NewGrpcClientPool(conf GrpcClientConfig) (pool *GrpcClientPool, err error) {
+func NewGrpcClientPool(conf GrpcClientConfig, opt ...grpc.DialOption) (pool *GrpcClientPool, err error) {
 
 	if conf.PoolSize < len(conf.Addrs) {
 		conf.PoolSize = len(conf.Addrs)
@@ -101,7 +104,21 @@ func NewGrpcClientPool(conf GrpcClientConfig) (pool *GrpcClientPool, err error) 
 		capacity: int64(conf.PoolSize),
 		conns:    make([]*longConn, conf.PoolSize),
 		w:        &weighted.SW{},
+
+		dialOpts: opt,
 	}
+
+	if len(pool.dialOpts) == 0 {
+		pool.dialOpts = []grpc.DialOption{
+			grpc.WithInsecure(),
+		}
+	}
+	pool.dialOpts = append(pool.dialOpts,
+		grpc.WithBlock(),
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:    time.Duration(pool.conf.KeepAliveSec) * time.Second,
+			Timeout: time.Duration(pool.conf.KeepAliveTimeOut) * time.Second,
+		}))
 
 	pool.connStats = make([]*addrStats, len(conf.Addrs))
 
@@ -306,12 +323,7 @@ func (pool *GrpcClientPool) connectAddr(addr string) (conn *grpc.ClientConn, err
 	conn, err = grpc.DialContext(
 		ctx,
 		addr,
-		grpc.WithInsecure(),
-		grpc.WithBlock(),
-		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:    time.Duration(pool.conf.KeepAliveSec) * time.Second,
-			Timeout: time.Duration(pool.conf.KeepAliveTimeOut) * time.Second,
-		}),
+		pool.dialOpts...,
 	)
 	if conn != nil {
 		pool.debugConn("connect", conn)

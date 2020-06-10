@@ -1,14 +1,15 @@
 package main
 
 import (
-	"biz-common/clients/test/test_proto"
 	"context"
 	"flag"
-	"github.com/opay-org/lib-common/xlog"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"test_proto"
+
+	"github.com/opay-org/lib-common/xlog"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"

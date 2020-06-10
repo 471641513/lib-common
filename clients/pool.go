@@ -14,6 +14,7 @@ type GrpcPool interface {
 	Close()
 }
 
+// TODO: add health check optimize for short conn
 func randAddr(addrs []string) (string, int) {
 	size := len(addrs)
 	if size == 0 {
@@ -27,8 +28,21 @@ func randAddr(addrs []string) (string, int) {
 ####################################################################################
 USE SHORT CONNECTION
 */
+
+func newShortGrpcClientPool(conf GrpcClientConfig, opt ...grpc.DialOption) (pool *ShortGrpcPool, err error) {
+	pool = &ShortGrpcPool{
+		conf:     conf,
+		dialOpts: opt,
+	}
+	if len(pool.dialOpts) == 0 {
+		pool.dialOpts = []grpc.DialOption{grpc.WithInsecure()}
+	}
+	return
+}
+
 type ShortGrpcPool struct {
-	conf GrpcClientConfig
+	conf     GrpcClientConfig
+	dialOpts []grpc.DialOption
 }
 
 func (pool *ShortGrpcPool) randAddr() string {
@@ -37,9 +51,9 @@ func (pool *ShortGrpcPool) randAddr() string {
 }
 
 func (pool *ShortGrpcPool) Get() (conn *grpc.ClientConn, err error) {
-	conn, err = grpc.Dial(pool.randAddr(), grpc.WithInsecure())
+	conn, err = grpc.Dial(pool.randAddr(), pool.dialOpts...)
 	if err != nil {
-		conn, err = grpc.Dial(pool.randAddr(), grpc.WithInsecure())
+		conn, err = grpc.Dial(pool.randAddr(), pool.dialOpts...)
 	}
 	return
 }

@@ -38,7 +38,7 @@ type GrpcClientConfig struct {
 	KeepAliveTimeOut int   `toml:"keep_alive_timeout_sec"`
 }
 
-func NewGrpcClientBase(conf GrpcClientConfig) (base *GrpcClientBase, err error) {
+func NewGrpcClientBase(conf GrpcClientConfig, dialOpts ...grpc.DialOption) (base *GrpcClientBase, err error) {
 
 	if conf.DialTimeoutMs <= 0 {
 		conf.DialTimeoutMs = 200
@@ -84,12 +84,10 @@ func NewGrpcClientBase(conf GrpcClientConfig) (base *GrpcClientBase, err error) 
 		conf: conf,
 	}
 	if !conf.LongConnection {
-		base.pool = &ShortGrpcPool{
-			conf: conf,
-		}
+		base.pool, _ = newShortGrpcClientPool(conf, dialOpts...)
 	} else {
 		xlog.Info(" _GrpcClientBase_init||long_pool=true||conf=%v", conf)
-		base.pool, err = NewGrpcClientPool(conf)
+		base.pool, err = NewGrpcClientPool(conf, dialOpts...)
 		if err != nil {
 			return nil, err
 		}
