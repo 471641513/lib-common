@@ -108,6 +108,10 @@ func (e *testEntity) SetUpdateTime(ts int64) {
 	e.UpdateTime = time.Unix(ts, 0)
 }
 
+func (e *testEntity) Entity() Entity {
+	return e
+}
+
 var convertWrapper *obj_utils.CopyEntity2MapWrapper
 
 func init() {
@@ -125,16 +129,8 @@ func (e *testEntity) Entity2MapWrapper() *obj_utils.CopyEntity2MapWrapper {
 }
 
 type testDataAction struct {
-	e *testEntity
+	*testEntity
 	*DataWriteActionBase
-}
-
-func (a *testDataAction) Entity() Entity {
-	return a.e
-}
-
-func (a *testDataAction) WriteActionBase() *DataWriteActionBase {
-	return a.DataWriteActionBase
 }
 
 type statEntity struct {
@@ -178,7 +174,7 @@ func TestUpdateTimestampTimezone(t *testing.T) {
 						DataWriteActionBase: &DataWriteActionBase{
 							Type: DateActionType_Create,
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      233,
 							OriAddr: "ori1",
 							OriLat:  1,
@@ -240,7 +236,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 						DataWriteActionBase: &DataWriteActionBase{
 							Type: DateActionType_Create,
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      1,
 							OriAddr: "ori1",
 							OriLat:  1,
@@ -280,7 +276,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 								"ori_lng",
 							},
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      1,
 							OriAddr: "ori2",
 							OriLat:  10,
@@ -307,7 +303,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 						DataWriteActionBase: &DataWriteActionBase{
 							Type: DateActionType_Create,
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      2,
 							OriAddr: "rollback_1",
 							OriLat:  1,
@@ -317,7 +313,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 						DataWriteActionBase: &DataWriteActionBase{
 							Type: DateActionType_Create,
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      2,
 							OriAddr: "rollback_1",
 							OriLat:  1,
@@ -341,7 +337,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 						DataWriteActionBase: &DataWriteActionBase{
 							Type: DateActionType_Create,
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      2,
 							OriAddr: "rollback_1",
 							OriLat:  1,
@@ -359,7 +355,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 								"status in (1,2)",
 							},
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:     2,
 							OriLat: 10,
 							OriLng: 20,
@@ -399,7 +395,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 								"ori_addr",
 							},
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      2,
 							OriAddr: "rollback_4",
 							Status:  100,
@@ -415,7 +411,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 								"status in (3,2)",
 							},
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      2,
 							OriAddr: "rollback_4",
 							Status:  100,
@@ -439,7 +435,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 						DataWriteActionBase: &DataWriteActionBase{
 							Type: DateActionType_Create,
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:      3,
 							OriAddr: "rollback_3",
 							OriLat:  1,
@@ -457,7 +453,7 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 								"status in (3,2)",
 							},
 						},
-						e: &testEntity{
+						testEntity: &testEntity{
 							ID:     3,
 							OriLat: 10,
 							OriLng: 20,

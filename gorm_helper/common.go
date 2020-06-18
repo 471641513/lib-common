@@ -38,6 +38,10 @@ type DataWriteActionBase struct {
 	SkipEnsureRowAffected bool          // 强制全成功
 }
 
+func (b *DataWriteActionBase) WriteActionBase() *DataWriteActionBase {
+	return b
+}
+
 type DataQueryAction struct {
 	TableName   string
 	Ids         []int64
