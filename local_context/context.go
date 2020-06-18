@@ -2,15 +2,23 @@ package local_context
 
 import (
 	"context"
+
 	"github.com/opay-org/lib-common/utils"
 )
 
 type LocalContext struct {
 	context.Context
-	data  map[string]interface{}
-	logid string
+	data   map[string]interface{}
+	logid  string
+	method string
 }
 
+func (ctx *LocalContext) Method() string {
+	return ctx.method
+}
+func (ctx *LocalContext) SetMethod(method string) {
+	ctx.method = method
+}
 func (ctx *LocalContext) LogId() string {
 	return ctx.logid
 }
