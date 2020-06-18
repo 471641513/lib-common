@@ -15,7 +15,7 @@ const totalCntCacheKey = "db:cnt"
 
 type ValAny string
 
-type entity interface {
+type Entity interface {
 	TableName() string
 	PrimaryId() int64
 	Entity2MapWrapper() *obj_utils.CopyEntity2MapWrapper
@@ -26,7 +26,7 @@ type entityWithUpdateTime interface {
 }
 
 type DataWriteAction interface {
-	Entity() entity
+	Entity() Entity
 	WriteActionBase() *DataWriteActionBase
 }
 

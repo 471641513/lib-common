@@ -42,6 +42,27 @@ type CopyEntity2MapWrapper struct {
 	gormField2idx map[string]int
 }
 
+func MustCompileCopyEntity2MapWrapper(src interface{}) (w *CopyEntity2MapWrapper) {
+	var err error
+	defer func() {
+		if err != nil {
+			panic(err)
+		}
+	}()
+	if src == nil {
+		err = fmt.Errorf("src or dest nil||src=%v", src)
+		return
+	}
+
+	if reflect.TypeOf(src).Kind() != reflect.Struct {
+		xlog.Warn("reflect.TypeOf(src).Kind() =%v", reflect.TypeOf(src).Kind())
+		err = fmt.Errorf("src not struct")
+		return
+	}
+	w, err = compileCopyEntity2MapWrapper(reflect.TypeOf(src))
+	return
+}
+
 func CompileCopyEntity2MapWrapper(src interface{}) (w *CopyEntity2MapWrapper, err error) {
 	if src == nil {
 		err = fmt.Errorf("src or dest nil||src=%v", src)

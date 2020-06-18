@@ -129,7 +129,7 @@ type testDataAction struct {
 	*DataWriteActionBase
 }
 
-func (a *testDataAction) Entity() entity {
+func (a *testDataAction) Entity() Entity {
 	return a.e
 }
 
