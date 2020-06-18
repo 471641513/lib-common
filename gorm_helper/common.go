@@ -45,7 +45,7 @@ func NewCreateDataWriteAction() (a *DataWriteActionBase) {
 		Type: DateActionType_Create,
 	}
 }
-func NewUpdateDataWriteAction(fields []string, wheres []string, args []interface{}) (a *DataWriteActionBase) {
+func NewUpdateDataWriteAction(fields []string, wheres []string, args ...interface{}) (a *DataWriteActionBase) {
 	return &DataWriteActionBase{
 		Type:   DateActionType_Update,
 		Fields: fields,
