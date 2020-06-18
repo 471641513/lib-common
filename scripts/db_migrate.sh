@@ -46,6 +46,7 @@ for table in ${table_list[@]}; do
             }
             BEGIN{
                 idx=0
+                withId=0
                 print "package entity"
                 print "//'${tableCmt}'"
                 print "type '${tableUpper}' struct {"
@@ -61,14 +62,21 @@ for table in ${table_list[@]}; do
             cmd | getline ufield
             close(cmd)
             idx += 1
-
+            if ( field == "id" ) {
+                withId = 1
+            }
             print "\t//" comment
             print "\t" ufield"\t"convertType(type)"\t`gorm:\"column:"field"\" json:\""field"\"`"
         }END{
             print "}\n"
             print "func (e *'${tableUpper}') TableName() string {"
             print "\treturn \"'${table}'\""
-            print "}"
+            print "}\n"
+            if ( withId > 0 ) {
+                print "func (e *'${tableUpper}') PrimaryId() int64 {"
+                print "\treturn e.Id "
+                print "}"
+            }
         }' > db_out/entity/${tableUpper}.go
 
     go fmt db_out/entity/${tableUpper}.go
