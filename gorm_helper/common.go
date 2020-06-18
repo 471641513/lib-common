@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/opay-org/lib-common/utils/obj_utils"
+
 	"github.com/jinzhu/gorm"
 	"github.com/opay-org/lib-common/local_context"
 	"github.com/opay-org/lib-common/utils"
-	"github.com/opay-org/lib-common/utils/obj_utils"
 )
 
 const maxLimit = 500
@@ -18,7 +19,6 @@ type ValAny string
 type Entity interface {
 	TableName() string
 	PrimaryId() int64
-	Entity2MapWrapper() *obj_utils.CopyEntity2MapWrapper
 }
 type entityWithUpdateTime interface {
 	UpdateTimeField() string
@@ -27,6 +27,7 @@ type entityWithUpdateTime interface {
 
 type DataWriteAction interface {
 	Entity() Entity
+	Entity2MapWrapper() *obj_utils.CopyEntity2MapWrapper
 	WriteActionBase() *DataWriteActionBase
 }
 
@@ -36,6 +37,21 @@ type DataWriteActionBase struct {
 	Wheres                []string      // 更新condition
 	Args                  []interface{} // where的args
 	SkipEnsureRowAffected bool          // 强制全成功
+	OnDuplicateOpt        string        // on duplicate
+}
+
+func NewCreateDataWriteAction() (a *DataWriteActionBase) {
+	return &DataWriteActionBase{
+		Type: DateActionType_Create,
+	}
+}
+func NewUpdateDataWriteAction(fields []string, wheres []string, args []interface{}) (a *DataWriteActionBase) {
+	return &DataWriteActionBase{
+		Type:   DateActionType_Update,
+		Fields: fields,
+		Wheres: wheres,
+		Args:   args,
+	}
 }
 
 func (b *DataWriteActionBase) WriteActionBase() *DataWriteActionBase {

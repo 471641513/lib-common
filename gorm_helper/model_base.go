@@ -95,6 +95,10 @@ func (m *GormModelBase) Cache() *model.BaseCacheModel {
 	return m.cache
 }
 
+func (m *GormModelBase) ProcWriteAction(ctx *local_context.LocalContext, action ...DataWriteAction) (rslt *gorm.DB, err error) {
+	return m.ProcWriteActions(ctx, action)
+}
+
 // process write action
 func (m *GormModelBase) ProcWriteActions(ctx *local_context.LocalContext, actions []DataWriteAction) (rslt *gorm.DB, err error) {
 	if len(actions) == 0 {
@@ -206,7 +210,12 @@ func (m *GormModelBase) process(ctx *local_context.LocalContext, db *gorm.DB, a 
 		if e, ok := a.Entity().(entityWithUpdateTime); ok {
 			e.SetUpdateTime(now.Unix())
 		}
-		dbRslt = db.Model(a.Entity()).Create(a.Entity())
+
+		dbRslt = db.Model(a.Entity())
+		if onDuplicateIgnoreOpt := a.WriteActionBase().OnDuplicateOpt; onDuplicateIgnoreOpt != "" {
+			dbRslt = dbRslt.Set("gorm:insert_option", fmt.Sprintf("ON DUPLICATE KEY %s", onDuplicateIgnoreOpt))
+		}
+		dbRslt = dbRslt.Create(a.Entity())
 	case DateActionType_Update:
 		tableName := ""
 		updates := map[string]interface{}{}
@@ -214,7 +223,7 @@ func (m *GormModelBase) process(ctx *local_context.LocalContext, db *gorm.DB, a 
 		var skip []string
 		tableName = a.Entity().TableName()
 		id = a.Entity().PrimaryId()
-		updates, skip, err = a.Entity().Entity2MapWrapper().ConvertEntityToMap(a.Entity(), a.WriteActionBase().Fields)
+		updates, skip, err = a.Entity2MapWrapper().ConvertEntityToMap(a.Entity(), a.WriteActionBase().Fields)
 		if err != nil {
 			xlog.Error("logid=%v||faild to convert||err=%v", ctx.LogId(), err)
 			return

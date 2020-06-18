@@ -42,6 +42,10 @@ type CopyEntity2MapWrapper struct {
 	gormField2idx map[string]int
 }
 
+func (w *CopyEntity2MapWrapper) CopyEntity2MapWrapper() *CopyEntity2MapWrapper {
+	return w
+}
+
 func MustCompileCopyEntity2MapWrapper(src interface{}) (w *CopyEntity2MapWrapper) {
 	var err error
 	defer func() {

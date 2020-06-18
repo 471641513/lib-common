@@ -124,7 +124,7 @@ func init() {
 	}
 }
 
-func (e *testEntity) Entity2MapWrapper() *obj_utils.CopyEntity2MapWrapper {
+func (e *testDataAction) Entity2MapWrapper() *obj_utils.CopyEntity2MapWrapper {
 	return convertWrapper
 }
 
@@ -261,6 +261,49 @@ func TestTestDataModel_ProcWriteActions(t *testing.T) {
 					xlog.Info("o2=%+v", o2)
 
 					assert.Equal(t, o2[0].OriAddr, "ori1")
+				},
+			},
+		}, {
+			name: "create single order fail",
+			args: args{
+				actions: []DataWriteAction{
+					&testDataAction{
+						DataWriteActionBase: &DataWriteActionBase{
+							Type:           DateActionType_Create,
+							OnDuplicateOpt: "update id=id",
+						},
+						testEntity: &testEntity{
+							ID:      1,
+							OriAddr: "ori1",
+							OriLat:  1,
+							OriLng:  2,
+						},
+					}},
+				assert: func(t *testing.T, rslt *gorm.DB, err error) {
+					assert.NotNil(t, err)
+				},
+			},
+		},
+		{
+			name: "create single order on duplicate update",
+			args: args{
+				actions: []DataWriteAction{
+					&testDataAction{
+						DataWriteActionBase: &DataWriteActionBase{
+							Type:                  DateActionType_Create,
+							OnDuplicateOpt:        "update id=id",
+							SkipEnsureRowAffected: true,
+						},
+						testEntity: &testEntity{
+							ID:      1,
+							OriAddr: "ori1",
+							OriLat:  1,
+							OriLng:  2,
+						},
+					}},
+				assert: func(t *testing.T, rslt *gorm.DB, err error) {
+					assert.Nil(t, err)
+					assert.Nil(t, rslt.Error)
 				},
 			},
 		},
