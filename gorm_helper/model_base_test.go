@@ -203,6 +203,18 @@ func TestUpdateTimestampTimezone(t *testing.T) {
 					xlog.Info("o2=%+v", o2)
 
 					assert.Equal(t, "ori1", o2[0].OriAddr)
+
+					o3 := testEntity{}
+					query2 := &DataQueryAction{
+						TableName: o.TableName(),
+						Wheres: []string{
+							fmt.Sprintf("unix_timestamp(update_time)<=%v", nowTs.Unix()+1),
+						},
+					}
+					rrslt, _, err = defaultM.ProcQuery(ctx, query2, &o3)
+					//assert.Nil(t, err)
+					//assert.Nil(t, rrslt.Error)
+					xlog.Info("o3=%+v||rrslt=%+v||err=%v", o3, rrslt, err)
 				},
 			},
 		},

@@ -61,6 +61,8 @@ func NewGormModelBase(conf *ModelConfig, redisCli *redis.Client, dbConf model.Db
 		m.reservedFields[field] = nil
 	}
 
+	m.cache = model.NewBaseCacheModel(redisCli, time.Minute*5)
+
 	m.db, err = model.NewGorm(dbConf)
 	if err != nil {
 		xlog.Error("failed to NewOpayProductModel db||err=%v", err)

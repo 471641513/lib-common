@@ -19,6 +19,7 @@ require (
 	github.com/smallnest/weighted v0.0.0-20200122032019-adf21c9b8bd1
 	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.4.0
+	golang.org/x/exp v0.0.0-20200119233911-0405dc783f0a
 	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
 	google.golang.org/grpc v1.27.1
 	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
