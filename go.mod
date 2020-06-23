@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/confluentinc/confluent-kafka-go v1.3.0
 	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.3.4
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.9
