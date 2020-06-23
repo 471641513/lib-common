@@ -2,6 +2,7 @@ package local_context
 
 import (
 	"context"
+	"time"
 
 	"github.com/opay-org/lib-common/utils"
 )
@@ -52,4 +53,13 @@ func NewLocalContextWithTrace(logid string) *LocalContext {
 		data:    map[string]interface{}{},
 		logid:   logid,
 	}
+}
+
+type TraceContext interface {
+	LogId() string
+
+	Deadline() (deadline time.Time, ok bool)
+	Done() <-chan struct{}
+	Err() error
+	Value(key interface{}) interface{}
 }
