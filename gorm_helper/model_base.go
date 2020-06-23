@@ -125,9 +125,6 @@ func (m *GormModelBase) ProcWriteActions(ctx *local_context.LocalContext, action
 				xlog.Fatal("logid=%v||catch panic | %s\n%s", ctx.LogId(), e, debug.Stack())
 				err = fmt.Errorf("panic||err=%v", e)
 			}
-			if err != nil {
-				xlog.Error("logid=%v||MYSQL FAILED||err=%v", ctx.LogId(), err)
-			}
 		}()
 		// process single
 		action := actions[0]
@@ -148,7 +145,7 @@ func (m *GormModelBase) ProcWriteActions(ctx *local_context.LocalContext, action
 			return
 		}
 		if rslt.RowsAffected == 0 {
-			xlog.Warn("logid=%v||no row affected||idx=%v||action=%+v", ctx.LogId(), idx, action)
+			//xlog.Warn("logid=%v||no row affected||idx=%v||action=%+v", ctx.LogId(), idx, action)
 			if !action.WriteActionBase().SkipEnsureRowAffected {
 				err = fmt.Errorf("no row affected||where=%v||args=%v", action.WriteActionBase().Wheres, action.WriteActionBase().Args)
 				return
