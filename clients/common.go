@@ -19,6 +19,15 @@ import (
 version: 1.0.3
 */
 
+type TraceContext interface {
+	LogId() string
+
+	Deadline() (deadline time.Time, ok bool)
+	Done() <-chan struct{}
+	Err() error
+	Value(key interface{}) interface{}
+}
+
 const ERR_SUCC = "succ"
 const ERR_ERR = "err"
 
@@ -138,6 +147,11 @@ func (cli *GrpcClientBase) CreateMetricsV2(
 
 func (cli *GrpcClientBase) GetTimeout(parentCtx *local_context.LocalContext) (cctx context.Context) {
 	cctx, _ = context.WithTimeout(parentCtx.Context, time.Duration(cli.conf.ReadTimeoutMs)*time.Millisecond)
+	return
+}
+
+func (cli *GrpcClientBase) GetTimeoutFromCtx(parentCtx TraceContext) (cctx context.Context) {
+	cctx, _ = context.WithTimeout(parentCtx, time.Duration(cli.conf.ReadTimeoutMs)*time.Millisecond)
 	return
 }
 
