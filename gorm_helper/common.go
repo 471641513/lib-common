@@ -2,6 +2,7 @@ package gorm_helper
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/opay-org/lib-common/utils/obj_utils"
@@ -15,6 +16,11 @@ const maxLimit = 500
 const totalCntCacheKey = "db:cnt"
 
 type ValAny string
+
+func (valAny ValAny) Int64(i int64, err error) {
+	i, err = strconv.ParseInt(string(valAny), 10, 64)
+	return
+}
 
 type Entity interface {
 	TableName() string
