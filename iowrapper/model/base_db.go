@@ -20,12 +20,16 @@ type DbConfig struct {
 	Charset  string `toml:"charset"`
 	Database string `toml:"database"`
 	Debug    bool   `toml:"debug"`
+	Loc      string `toml:"loc"`
 }
 
 func (c *DbConfig) GetDsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local&timeout=10s",
-		c.User, c.Password, c.Host, c.Port, c.Database, c.Charset)
-
+	if c.Loc == "" {
+		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local&timeout=10s",
+			c.User, c.Password, c.Host, c.Port, c.Database, c.Charset)
+	}
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=%s&timeout=10s",
+		c.User, c.Password, c.Host, c.Port, c.Database, c.Charset, c.Loc)
 }
 
 type Logger struct {
