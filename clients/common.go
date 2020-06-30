@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"time"
 
+	"google.golang.org/grpc/metadata"
+
 	"github.com/opay-org/lib-common/local_context"
 	"github.com/opay-org/lib-common/metrics"
 	"github.com/opay-org/lib-common/xlog"
@@ -21,6 +23,7 @@ version: 1.0.3
 
 type TraceContext interface {
 	LogId() string
+	SetLogId(logid string)
 
 	Deadline() (deadline time.Time, ok bool)
 	Done() <-chan struct{}
@@ -30,6 +33,10 @@ type TraceContext interface {
 
 const ERR_SUCC = "succ"
 const ERR_ERR = "err"
+
+const (
+	CODE_SUCC = 0
+)
 
 type GrpcClientConfig struct {
 	Caller         string   `toml:"caller"`
@@ -145,14 +152,26 @@ func (cli *GrpcClientBase) CreateMetricsV2(
 	cli.MetricsBase.CreateMetricsCountVec(prefix, "grpc", "cnt", countLables)
 }
 
-func (cli *GrpcClientBase) GetTimeout(parentCtx *local_context.LocalContext) (cctx context.Context) {
-	cctx, _ = context.WithTimeout(parentCtx.Context, time.Duration(cli.conf.ReadTimeoutMs)*time.Millisecond)
+const (
+	HEADER_TRACE  = "opay-grpc-trace-id"
+	HEADER_CALLER = "opay-grpc-caller"
+)
+
+func (cli *GrpcClientBase) GetTimeout(parentCtx local_context.TraceContext) (cctx context.Context) {
+	mdMap := map[string]string{
+		HEADER_TRACE: parentCtx.LogId(),
+	}
+	if cli.conf.Caller != "" {
+		mdMap[HEADER_CALLER] = cli.conf.Caller
+	}
+	md := metadata.New(mdMap)
+	cctx = metadata.NewOutgoingContext(parentCtx, md)
+	cctx, _ = context.WithTimeout(cctx, time.Duration(cli.conf.ReadTimeoutMs)*time.Millisecond)
 	return
 }
 
 func (cli *GrpcClientBase) GetTimeoutFromCtx(parentCtx TraceContext) (cctx context.Context) {
-	cctx, _ = context.WithTimeout(parentCtx, time.Duration(cli.conf.ReadTimeoutMs)*time.Millisecond)
-	return
+	return cli.GetTimeout(parentCtx)
 }
 
 func (cli *GrpcClientBase) Get() (conn *grpc.ClientConn, err error) {
