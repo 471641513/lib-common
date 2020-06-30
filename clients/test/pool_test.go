@@ -5,20 +5,39 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"os"
 	"sync"
 	"test_proto"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/opay-org/lib-common/local_context"
+
+	"github.com/opay-org/lib-common/metrics"
+	"github.com/opay-org/lib-common/middleware"
+
 	"github.com/opay-org/lib-common/utils"
 
 	"github.com/opay-org/lib-common/clients"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/keepalive"
-
 	"github.com/opay-org/lib-common/xlog"
+	"google.golang.org/grpc"
 )
+
+func TestMain(m *testing.M) {
+	xlog.SetupLogDefault()
+	ctx, cancel := context.WithCancel(context.Background())
+	go startStub(ctx)
+	// setup code...
+	code := m.Run()
+	// teardown code...
+	xlog.Close()
+	cancel()
+	time.Sleep(time.Second)
+	os.Exit(code)
+}
 
 const testPort = 11113
 const clientN = 1
@@ -28,14 +47,15 @@ type stub struct {
 }
 
 func (s *stub) AddLocs(ctx context.Context, req *test_proto.Req) (*test_proto.Rsp, error) {
+	xlog.Info("req=%+v", req)
 	return &test_proto.Rsp{}, nil
 }
 
 func startStub(ctx context.Context) {
-	s := grpc.NewServer(
-		grpc.KeepaliveParams(keepalive.ServerParameters{}),
-		grpc.MaxConcurrentStreams(10000),
-	)
+	options := middleware.DefaultGrpcOptions()
+	options = append(options,
+		middleware.GrpcInterceptorServerOption(metrics.MetricsBase{}, nil))
+	s := grpc.NewServer(options...)
 	handler := &stub{}
 	test_proto.RegisterTestStubServer(s, handler)
 	// set up server
@@ -51,12 +71,26 @@ func startStub(ctx context.Context) {
 	}
 }
 
-func Test_Pool(t *testing.T) {
-	xlog.SetupLogDefault()
-	defer xlog.Close()
+func Test_Trace(t *testing.T) {
 
-	ctx, cancel := context.WithCancel(context.Background())
-	go startStub(ctx)
+	time.Sleep(time.Second)
+	conf := clients.GrpcClientConfig{
+		Addrs: []string{
+			fmt.Sprintf("127.0.0.1:%v", testPort),
+		},
+		PoolMaxAliveSec: 5,
+		PoolSize:        10,
+		ReadTimeoutMs:   300,
+	}
+	cli, err := clients.NewGrpcClientBase(conf)
+	assert.Nil(t, err)
+	doReq(cli)
+
+	time.Sleep(time.Second)
+
+}
+
+func tTest_Pool(t *testing.T) {
 
 	time.Sleep(time.Second)
 	// test short conn pool
@@ -64,7 +98,7 @@ func Test_Pool(t *testing.T) {
 
 	// test long conn
 	testPool(t, true)
-	cancel()
+
 	time.Sleep(time.Second)
 }
 
@@ -79,6 +113,7 @@ func testPool(t *testing.T, LongConnection bool) {
 		LongConnection:  LongConnection,
 		PoolMaxAliveSec: 5,
 		PoolSize:        10,
+		ReadTimeoutMs:   300,
 	}
 	pool, err := clients.NewGrpcClientBase(conf)
 	if err != nil {
@@ -128,8 +163,10 @@ func doReq(pool *clients.GrpcClientBase) {
 		return
 	}
 	defer pool.Put(conn)
-	ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*300)
-	_, err = test_proto.NewTestStubClient(conn).AddLocs(ctx, &test_proto.Req{
-		Id: int64(rand.Int()),
+	ctx := local_context.NewLocalContext()
+	cctx := pool.GetTimeout(ctx)
+	_, err = test_proto.NewTestStubClient(conn).AddLocs(cctx, &test_proto.Req{
+		Id:    int64(rand.Int()),
+		Trace: &test_proto.Trace{},
 	})
 }

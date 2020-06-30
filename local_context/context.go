@@ -57,6 +57,7 @@ func NewLocalContextWithTrace(logid string) *LocalContext {
 
 type TraceContext interface {
 	LogId() string
+	SetLogId(logid string)
 
 	Deadline() (deadline time.Time, ok bool)
 	Done() <-chan struct{}

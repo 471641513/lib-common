@@ -1,4 +1,4 @@
-package main
+package archive
 
 import (
 	"context"
@@ -53,5 +53,9 @@ func main() {
 	xlog.Info("sig:%v is received, start to quit safely", sig)
 	cancel()
 	wg.Wait()
+
+}
+
+func run(base *clients.GrpcClientBase, err error) {
 
 }

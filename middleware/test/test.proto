@@ -6,6 +6,11 @@ message Trace {
     string caller = 2;
 }
 
+message Error {
+    int64 code = 1;
+    string message = 2;
+}
+
 message Req {
     int64 id = 1;
 
@@ -13,13 +18,9 @@ message Req {
 }
 
 message Rsp {
-    // response code
-    int64 code = 1;
-    // response message
-    string message = 2;
-
+    Error Error = 1;
 }
 
 service TestStub {
-    rpc AddLocs (Req) returns (Rsp);
+    rpc TestApi (Req) returns (Rsp);
 }

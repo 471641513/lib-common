@@ -1,4 +1,4 @@
-package main
+package archive
 
 import (
 	"context"
@@ -9,10 +9,15 @@ import (
 	"syscall"
 	"test_proto"
 
+	"github.com/opay-org/lib-common/local_context"
+
+	"github.com/opay-org/lib-common/metrics"
+
+	"github.com/opay-org/lib-common/middleware"
+
 	"github.com/opay-org/lib-common/xlog"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/keepalive"
 )
 
 type stub struct {
@@ -20,6 +25,8 @@ type stub struct {
 }
 
 func (s *stub) AddLocs(ctx context.Context, req *test_proto.Req) (*test_proto.Rsp, error) {
+	lctx := ctx.(*local_context.LocalContext)
+	xlog.Info("req=%+v||lctx=%+v", req, lctx)
 	return &test_proto.Rsp{}, nil
 }
 
@@ -30,10 +37,10 @@ func main() {
 	//listen := ":13333"
 	xlog.SetupLogDefault()
 	xlog.Info("listen to %v", *listen)
-	s := grpc.NewServer(
-		grpc.KeepaliveParams(keepalive.ServerParameters{}),
-		grpc.MaxConcurrentStreams(10000),
-	)
+	options := middleware.DefaultGrpcOptions()
+	options = append(options,
+		middleware.GrpcInterceptorServerOption(metrics.MetricsBase{}, nil))
+	s := grpc.NewServer(options...)
 	handler := &stub{}
 	test_proto.RegisterTestStubServer(s, handler)
 
