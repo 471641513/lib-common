@@ -81,16 +81,32 @@ func NewGormModelBase(conf *ModelConfig, redisCli *redis.Client, dbConf model.Db
 	return
 }
 
-func (m *GormModelBase) DB() *gorm.DB {
+func (m *GormModelBase) DB(ctx ...local_context.TraceContext) *gorm.DB {
+	if len(ctx) > 0 && ctx[0] != nil {
+		return m.SetTrace(ctx[0], m.db)
+	}
 	return m.db
 }
 
-func (m *GormModelBase) SlaveDB() *gorm.DB {
+func (m *GormModelBase) SlaveDB(ctx ...local_context.TraceContext) *gorm.DB {
+	db := m.db
 	if len(m.slaveDbs) > 0 {
 		idx := m.w.Next().(int)
-		return m.slaveDbs[idx]
+		db = m.slaveDbs[idx]
 	}
-	return m.db
+	if len(ctx) > 0 && ctx[0] != nil {
+		db = m.SetTrace(ctx[0], db)
+	}
+	return db
+}
+
+func (m *GormModelBase) SetTrace(ctx local_context.TraceContext, db *gorm.DB) (dbOut *gorm.DB) {
+	dbOut = db
+	if ctx.LogId() != "" {
+		dbOut = db.New()
+		dbOut.SetLogger(&model.LoggerWithTrace{TraceId: ctx.LogId()})
+	}
+	return
 }
 
 func (m *GormModelBase) Cache() *model.BaseCacheModel {
@@ -103,11 +119,12 @@ func (m *GormModelBase) ProcWriteAction(ctx *local_context.LocalContext, action 
 
 // process write action
 func (m *GormModelBase) ProcWriteActions(ctx *local_context.LocalContext, actions []DataWriteAction) (rslt *gorm.DB, err error) {
+
 	if len(actions) == 0 {
 		err = fmt.Errorf("action is empty")
 		return
 	}
-
+	db := m.DB(ctx)
 	defer func() {
 		if rslt != nil && err == nil {
 			if rslt.Error != nil {
@@ -128,7 +145,7 @@ func (m *GormModelBase) ProcWriteActions(ctx *local_context.LocalContext, action
 		}()
 		// process single
 		action := actions[0]
-		rslt, err = m.process(ctx, m.db, action)
+		rslt, err = m.process(ctx, db, action)
 		idx := 0
 		if err != nil {
 			xlog.Error("logid=%v||transaction failed at=%v||action=%+v||err=%v", ctx.LogId(), idx, action, err)
@@ -152,7 +169,7 @@ func (m *GormModelBase) ProcWriteActions(ctx *local_context.LocalContext, action
 			}
 		}
 	} else {
-		tx := m.db.Begin()
+		tx := db.Begin()
 		defer func() {
 			if e := recover(); e != nil {
 				xlog.Fatal("logid=%v||catch panic | %s\n%s", ctx.LogId(), e, debug.Stack())
@@ -277,7 +294,7 @@ func (m *GormModelBase) ProcQuery(
 	}
 
 	//do query
-	exec, err := action.prepareQuery(ctx, m.SlaveDB())
+	exec, err := action.prepareQuery(ctx, m.SlaveDB(ctx))
 	if err != nil {
 		return
 	}
@@ -313,7 +330,7 @@ func (m *GormModelBase) CountQuery(
 	}
 
 	// count total
-	exec, err := action.prepareQuery(ctx, m.SlaveDB())
+	exec, err := action.prepareQuery(ctx, m.SlaveDB(ctx))
 	if err != nil {
 		return
 	}
@@ -336,7 +353,7 @@ func (m *GormModelBase) ProcAggregation(
 	ctx *local_context.LocalContext,
 	action *DataAggregationAction) (output [][]ValAny, err error) {
 
-	rslt := m.SlaveDB().Table(action.TableName).
+	rslt := m.SlaveDB(ctx).Table(action.TableName).
 		Select(strings.Join(action.Fields, ","))
 	if action.Join != "" {
 		rslt = rslt.Joins(action.Join)
