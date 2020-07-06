@@ -3,7 +3,6 @@ package test
 import (
 	"context"
 	"errors"
-	"os"
 	"reflect"
 	"test_proto"
 	"testing"
@@ -21,15 +20,6 @@ import (
 	"github.com/opay-org/lib-common/metrics"
 	"google.golang.org/grpc"
 )
-
-func TestMain(m *testing.M) {
-	xlog.SetupLogDefault()
-	// setup code...
-	code := m.Run()
-	// teardown code...
-	xlog.Close()
-	os.Exit(code)
-}
 
 func TestGrpcInterceptor(t *testing.T) {
 	m := metrics.MetricsBase{}

@@ -1,5 +1,7 @@
 syntax = "proto3";
 package test_proto;
+import "google/api/annotations.proto";
+
 
 message Trace {
     string trace_id = 1;
@@ -21,6 +23,28 @@ message Rsp {
     Error Error = 1;
 }
 
+message ReqWithoutTrace {
+    int64 id = 1;
+}
+
+message Data {
+    message User {
+        int64 id = 1;
+        string name = 2;
+        string user_name = 3;
+    }
+    repeated User user_list = 1;
+}
+
 service TestStub {
     rpc TestApi (Req) returns (Rsp);
-}
+};
+
+service TestStub2 {
+    rpc TestApi2(ReqWithoutTrace) returns (Data){
+        option (google.api.http) = {
+          post: "/test/stub2"
+          body: "*"
+        };
+    };
+};

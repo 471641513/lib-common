@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/opay-org/lib-common/clients"
+
 	"github.com/opay-org/lib-common/local_context"
 	"github.com/opay-org/lib-common/metrics"
 	"github.com/opay-org/lib-common/utils"
@@ -71,7 +73,8 @@ func (cli *HttpClient) PostJsonBody(
 	ctx *local_context.LocalContext,
 	path string,
 	data interface{},
-	rspPtr interface{}) (respBytes []byte, err error) {
+	rspPtr interface{},
+	marshalerOpt ...RespMarshaler) (respBytes []byte, err error) {
 
 	t0 := time.Now()
 	defer func() {
@@ -95,11 +98,22 @@ func (cli *HttpClient) PostJsonBody(
 	if cli.conf.Https {
 		url = fmt.Sprintf("https://%v%v", host, path)
 	}
+	proxyReq, err := http.NewRequest(http.MethodPost, url, reader)
+	if err != nil {
+		return
+	}
 
-	rspBody, err := cli.Client.Post(
-		url,
-		CONTENT_TYPE_JSON,
-		reader)
+	proxyReq.Header.Set("content-type", CONTENT_TYPE_JSON)
+	proxyReq.Header.Set(clients.HEADER_CALLER, cli.conf.Caller)
+	proxyReq.Header.Set(clients.HEADER_TRACE, ctx.LogId())
+
+	rspBody, err := cli.Client.Do(proxyReq)
+	/*
+		rspBody, err := cli.Client.Post(
+			url,
+			CONTENT_TYPE_JSON,
+			reader)
+	*/
 	if err != nil {
 		return
 	}
@@ -112,7 +126,7 @@ func (cli *HttpClient) PostJsonBody(
 		return
 	}
 	if rspPtr != nil {
-		err = json.Unmarshal(respBytes, rspPtr)
+		err = cli.decodeRsp(respBytes, rspPtr, marshalerOpt...)
 	}
 	return
 }
@@ -120,7 +134,8 @@ func (cli *HttpClient) PostJsonBody(
 func (cli *HttpClient) GetJsonBody(
 	ctx *local_context.LocalContext,
 	path string,
-	rspPtr interface{}) (respBytes []byte, err error) {
+	rspPtr interface{},
+	marshalerOpt ...RespMarshaler) (respBytes []byte, err error) {
 
 	t0 := time.Now()
 	defer func() {
@@ -153,7 +168,21 @@ func (cli *HttpClient) GetJsonBody(
 		return
 	}
 	if rspPtr != nil {
-		err = json.Unmarshal(respBytes, rspPtr)
+		err = cli.decodeRsp(respBytes, rspPtr, marshalerOpt...)
+	}
+	return
+}
+
+func (cli *HttpClient) decodeRsp(respBytes []byte, v interface{}, marshalerOpt ...RespMarshaler) (err error) {
+	var marshaler RespMarshaler
+	if len(marshalerOpt) == 0 {
+		marshaler = DefaultMarshaler
+	} else {
+		marshaler = marshalerOpt[0]
+	}
+	errStatus := marshaler.Unmarshal(respBytes, v)
+	if errStatus != nil {
+		err = errStatus.Err()
 	}
 	return
 }
