@@ -167,37 +167,40 @@ func GrpcInterceptor(
 		}()
 		// 0.parse trace and caller from header
 		traceId, caller := ParseTraceAndCaller(ctx, lctx)
-		traceRef := reflect.ValueOf(req).Elem().FieldByName(fieldTrace)
-		xlog.Debug("traceRef=%v||req=%+v||method=%v||ctx=%+v", traceRef, req, method, ctx)
 
-		if traceRef.IsValid() && traceRef.Type().Kind() == reflect.Ptr {
-			if traceRef.IsNil() && ensureTraceFunc != nil {
-				newTrace := ensureTraceFunc(traceRef.Type())
-				// 0.1 compare filed type and set default value
-				traceRefType, _ := reflect.TypeOf(req).Elem().FieldByName(fieldTrace)
-				if reflect.TypeOf(newTrace) == traceRefType.Type {
-					traceRef.Set(reflect.ValueOf(newTrace))
-				}
-			}
+		if ensureTraceFunc != nil {
+			// 0.1 compatible to request with trace object
+			traceRef := reflect.ValueOf(req).Elem().FieldByName(fieldTrace)
+			xlog.Debug("traceRef=%v||req=%+v||method=%v||ctx=%+v", traceRef, req, method, ctx)
 
-			if !traceRef.IsNil() {
-				reqTrace, ok := traceRef.Interface().(TraceIface)
-				xlog.Info("traceRef=%+v", ok)
-				if ok && reqTrace != nil {
-					if reqTrace.GetCaller() == "" && caller != "" {
-						setCaller(reqTrace, caller)
+			if traceRef.IsValid() && traceRef.Type().Kind() == reflect.Ptr {
+				if traceRef.IsNil() && ensureTraceFunc != nil {
+					newTrace := ensureTraceFunc(traceRef.Type())
+					// 0.1 compare filed type and set default value
+					traceRefType, _ := reflect.TypeOf(req).Elem().FieldByName(fieldTrace)
+					if reflect.TypeOf(newTrace) == traceRefType.Type {
+						traceRef.Set(reflect.ValueOf(newTrace))
 					}
-					if reqTrace.GetTraceId() != "" {
-						lctx.SetLogId(reqTrace.GetTraceId())
-					} else {
-						if reqTrace.GetTraceId() == "" && traceId != "" {
-							setTraceId(reqTrace, traceId)
+				}
+
+				if !traceRef.IsNil() {
+					reqTrace, ok := traceRef.Interface().(TraceIface)
+					xlog.Info("traceRef=%+v", ok)
+					if ok && reqTrace != nil {
+						if reqTrace.GetCaller() == "" && caller != "" {
+							setCaller(reqTrace, caller)
+						}
+						if reqTrace.GetTraceId() != "" {
+							lctx.SetLogId(reqTrace.GetTraceId())
+						} else {
+							if reqTrace.GetTraceId() == "" && traceId != "" {
+								setTraceId(reqTrace, traceId)
+							}
 						}
 					}
 				}
 			}
 		}
-
 		// 1. common metrics
 		defer func() {
 			timecost := utils.CalTimecost(t0)
@@ -206,7 +209,8 @@ func GrpcInterceptor(
 			if err != nil {
 				errType = clients.ERR_ERR
 			} else {
-				if rsp != nil {
+				// 0.1 compatible to request with error object
+				if rsp != nil && ensureErrorFunc != nil {
 					refErr := reflect.ValueOf(rsp).Elem().FieldByName(fieldError)
 					if refErr.IsValid() && refErr.Type().Kind() == reflect.Ptr {
 						if !refErr.IsNil() {

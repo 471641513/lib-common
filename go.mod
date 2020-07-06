@@ -4,10 +4,12 @@ go 1.12
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.3.0
 	github.com/go-redis/redis v6.15.7+incompatible
-	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/golang/protobuf v1.3.4
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
+	github.com/golang/protobuf v1.4.2
+	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.9
 	github.com/kr/beanstalk v0.0.0-20180818045031-cae1762e4858
@@ -21,7 +23,8 @@ require (
 	github.com/sony/sonyflake v1.0.0
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/exp v0.0.0-20200119233911-0405dc783f0a
-	golang.org/x/lint v0.0.0-20190313153728-d0100b6bd8b3 // indirect
-	google.golang.org/grpc v1.27.1
-	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc // indirect
+	golang.org/x/net v0.0.0-20191002035440-2ec189313ef0
+	google.golang.org/genproto v0.0.0-20200513103714-09dca8ec2884
+	google.golang.org/grpc v1.29.1
+	google.golang.org/protobuf v1.23.0
 )
