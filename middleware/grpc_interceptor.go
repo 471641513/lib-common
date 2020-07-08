@@ -65,6 +65,7 @@ func init() {}
 func ParseTraceAndCaller(ctx context.Context, tracedContext local_context.TraceContext) (traceId string, caller string) {
 	if tracedContext != nil {
 		md, ok := metadata.FromIncomingContext(ctx)
+		xlog.Debug("md=%+v", md)
 		if ok && md != nil {
 			l := md.Get(clients.HEADER_TRACE)
 			if len(l) > 0 {
@@ -167,7 +168,7 @@ func GrpcInterceptor(
 		}()
 		// 0.parse trace and caller from header
 		traceId, caller := ParseTraceAndCaller(ctx, lctx)
-
+		xlog.Debug("trace_id=%v||caller=%v", traceId, caller)
 		if ensureTraceFunc != nil {
 			// 0.1 compatible to request with trace object
 			traceRef := reflect.ValueOf(req).Elem().FieldByName(fieldTrace)

@@ -153,8 +153,9 @@ func (cli *GrpcClientBase) CreateMetricsV2(
 }
 
 const (
-	HEADER_TRACE  = "opay-grpc-trace-id"
-	HEADER_CALLER = "opay-grpc-caller"
+	HEADER_PREFIX = "Grpc-"
+	HEADER_TRACE  = "grpc-trace-id"
+	HEADER_CALLER = "grpc-caller"
 )
 
 func (cli *GrpcClientBase) GetTimeout(parentCtx local_context.TraceContext) (cctx context.Context) {

@@ -107,6 +107,7 @@ func (cli *HttpClient) PostJsonBody(
 	proxyReq.Header.Set(clients.HEADER_CALLER, cli.conf.Caller)
 	proxyReq.Header.Set(clients.HEADER_TRACE, ctx.LogId())
 
+	xlog.Info("proxyReq.Header=%+v", proxyReq.Header)
 	rspBody, err := cli.Client.Do(proxyReq)
 	/*
 		rspBody, err := cli.Client.Post(
