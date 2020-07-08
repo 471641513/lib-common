@@ -1,9 +1,12 @@
 package test_http_svr
 
 import (
+	"net"
 	"net/http"
 	"reflect"
 	"test_proto"
+
+	"google.golang.org/grpc"
 
 	"github.com/opay-org/lib-common/local_context"
 
@@ -24,8 +27,9 @@ type handler struct {
 }
 
 const (
-	caseUnimplemented = 1
-	caseSuccReturn    = 2
+	caseUnimplemented  = 1
+	caseSuccReturn     = 2
+	caseCustomizedCode = 10001
 )
 
 func (*handler) TestApi2(ctx context.Context, req *test_proto.ReqWithoutTrace) (*test_proto.Data, error) {
@@ -35,6 +39,9 @@ func (*handler) TestApi2(ctx context.Context, req *test_proto.ReqWithoutTrace) (
 	if req.Id == caseUnimplemented {
 		return nil, status.Errorf(codes.Unimplemented, "method TestApi2 not implemented")
 	}
+	if req.Id == caseCustomizedCode {
+		return nil, status.Error(codes.Code(caseCustomizedCode), "customized error")
+	}
 	return &test_proto.Data{UserList: []*test_proto.Data_User{{
 		Id:   req.Id,
 		Name: "testname",
@@ -42,14 +49,27 @@ func (*handler) TestApi2(ctx context.Context, req *test_proto.ReqWithoutTrace) (
 	}}, nil
 }
 
-func NewHttpStub(ctx context.Context, listen string) (err error) {
+func NewHttpStub(ctx context.Context, listen string, grpcListen string) (err error) {
 	interceptor := middleware.GrpcInterceptor(metrics.MetricsBase{})
+	h := &handler{}
+
+	grpcOpts := middleware.DefaultGrpcOptions()
+	grpcOpts = append(grpcOpts,
+		grpc.UnaryInterceptor(interceptor))
+	s := grpc.NewServer(grpcOpts...)
+	test_proto.RegisterTestStub2Server(s, h)
+	lis, err := net.Listen("tcp", grpcListen)
+	if err != nil {
+		xlog.Fatal("[tcp] listen to %v||err=%v", grpcListen, err)
+		return
+	}
+	go s.Serve(lis)
+
 	httpOpts := []runtime.ServeMuxOption{
 		middleware.HttpMarshalerServerMuxOption(),
 		middleware.TracedIncomingHeaderMatcherMuxOption(),
 	}
 	mux := runtime.NewServeMux(httpOpts...)
-	h := &handler{}
 	err = test_proto.RegisterTestStub2HandlerServer(ctx, mux, h, interceptor)
 	if err != nil {
 		xlog.Fatal("failed to register test stub||err=%v", err)

@@ -74,14 +74,32 @@ type StandardResponsMarshaler struct {
 	runtime.Marshaler
 }
 
+type rspErr interface {
+	GetMessage() string
+	GetCode() int32
+}
+
 // @override
 func (m *StandardResponsMarshaler) Marshal(v interface{}) (data []byte, err error) {
-	if rspErr, ok := v.(*status.Status); ok {
+	defer func() {
+		xlog.Debug("data=%s", data)
+	}()
+	if e, ok := v.(rspErr); ok {
+		rspErr := &json_rsp_unmarshal.Response{
+			Code:    e.GetCode(),
+			Message: e.GetMessage(),
+		}
 		data, err = m.Marshaler.Marshal(rspErr)
 		return
 	}
+	if rspErr, ok := v.(*status.Status); ok {
+		data, err = m.Marshaler.Marshal(rspErr)
+		return
+	} else {
+	}
 	vProtoMsg, ok := v.(proto.Message)
 	if !ok {
+		//xlog.Info("not proto message")
 		return m.Marshaler.Marshal(v)
 	}
 	ret, err := ptypes.MarshalAny(vProtoMsg)

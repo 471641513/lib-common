@@ -3,6 +3,8 @@ package json_rsp_unmarshal
 import (
 	"fmt"
 
+	"github.com/opay-org/lib-common/xlog"
+
 	"github.com/golang/protobuf/ptypes/any"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -65,6 +67,7 @@ func UnmarshalStdPbAny(data []byte, v interface{}) (errStatus *status.Status) {
 		return
 	}
 	// 2. build status error
+	xlog.Fatal("rspv.Code=%v", rspv.Code)
 	if rspv.Code != int32(codes.OK) && rspv.Code != CodeSucc {
 		errStatus = status.New(codes.Code(rspv.Code), rspv.Message)
 		return
