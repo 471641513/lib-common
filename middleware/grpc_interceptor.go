@@ -31,7 +31,7 @@ func DefaultGrpcOptions() (opts []grpc.ServerOption) {
 	return
 }
 
-func InitRpcMetrics(metrics metrics.MetricsBase, prefix string) {
+func InitRpcMetrics(metrics *metrics.MetricsBase, prefix string) {
 	metrics.CreateMetrics(fmt.Sprintf("%v_rpc", prefix), nil, []string{"method"})
 	metrics.CreateMetricsCountVec(prefix, "rpc", "cnt", []string{"method", "err", "caller"})
 	prometheus.MustRegister(metrics.GetMetricsVectors()...)
@@ -148,7 +148,6 @@ func GrpcInterceptor(
 			xlog.Info("inner interceptor registered")
 		}
 	}
-
 	//var interceptor grpc.UnaryServerInterceptor
 	interceptor = func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (rsp interface{}, err error) {
 		lctx := local_context.NewLocalContextWithCtx(ctx)
@@ -206,6 +205,7 @@ func GrpcInterceptor(
 		defer func() {
 			timecost := utils.CalTimecost(t0)
 			metrics.Observe(timecost, method)
+			xlog.Fatal("TIMECOST=%v", timecost)
 			errType := ""
 			if err != nil {
 				errType = clients.ERR_ERR

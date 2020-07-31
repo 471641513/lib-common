@@ -3,13 +3,17 @@ package test
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"sync"
 	"test_proto"
 	"testing"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/stretchr/testify/assert"
 
@@ -40,6 +44,7 @@ func TestMain(m *testing.M) {
 }
 
 const testPort = 11113
+const metricsPort = 11114
 const clientN = 1
 
 type stub struct {
@@ -53,8 +58,10 @@ func (s *stub) AddLocs(ctx context.Context, req *test_proto.Req) (*test_proto.Rs
 
 func startStub(ctx context.Context) {
 	options := middleware.DefaultGrpcOptions()
+	mtrx := &metrics.MetricsBase{}
+	middleware.InitRpcMetrics(mtrx, "test")
 	options = append(options,
-		middleware.GrpcInterceptorServerOption(metrics.MetricsBase{}, nil))
+		middleware.GrpcInterceptorServerOption(*mtrx, nil))
 	s := grpc.NewServer(options...)
 	handler := &stub{}
 	test_proto.RegisterTestStubServer(s, handler)
@@ -64,11 +71,20 @@ func startStub(ctx context.Context) {
 		xlog.Error("e=failed to set up server||err=%v", err)
 		return
 	}
+	go startMetricx(fmt.Sprintf(":%v", metricsPort))
+
 	xlog.Info("stub start listen :%v", testPort)
 	go s.Serve(lis)
 	select {
 	case <-ctx.Done():
 	}
+}
+
+func startMetricx(lis string) {
+	xlog.Info("metrics lis=%v", lis)
+	http.Handle("/metrics", promhttp.Handler())
+	err := http.ListenAndServe(lis, nil)
+	xlog.Info("metrics err=%v", err)
 }
 
 func Test_Trace(t *testing.T) {
@@ -86,6 +102,14 @@ func Test_Trace(t *testing.T) {
 	assert.Nil(t, err)
 	doReq(cli)
 
+	time.Sleep(time.Second)
+	resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%v/metrics", metricsPort))
+	if err == nil && resp.Body != nil {
+		// handle error
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		xlog.Info("rsp=%s||err=%v", body, err)
+	}
 	time.Sleep(time.Second)
 
 }

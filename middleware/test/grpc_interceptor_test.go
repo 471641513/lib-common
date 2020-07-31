@@ -22,7 +22,7 @@ import (
 )
 
 func TestGrpcInterceptor(t *testing.T) {
-	m := metrics.MetricsBase{}
+	m := &metrics.MetricsBase{}
 	middleware.InitRpcMetrics(m, "unitTest")
 
 	var ifunc func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (rsp interface{}, err error)
