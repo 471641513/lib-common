@@ -171,7 +171,7 @@ func GrpcInterceptor(
 		if ensureTraceFunc != nil {
 			// 0.1 compatible to request with trace object
 			traceRef := reflect.ValueOf(req).Elem().FieldByName(fieldTrace)
-			xlog.Debug("traceRef=%v||req=%+v||method=%v||ctx=%+v", traceRef, req, method, ctx)
+			//xlog.Debug("traceRef=%v||req=%+v||method=%v||ctx=%+v", traceRef, req, method, ctx)
 
 			if traceRef.IsValid() && traceRef.Type().Kind() == reflect.Ptr {
 				if traceRef.IsNil() && ensureTraceFunc != nil {
@@ -185,7 +185,7 @@ func GrpcInterceptor(
 
 				if !traceRef.IsNil() {
 					reqTrace, ok := traceRef.Interface().(TraceIface)
-					xlog.Info("traceRef=%+v", ok)
+					//xlog.Info("traceRef=%+v", ok)
 					if ok && reqTrace != nil {
 						if reqTrace.GetCaller() == "" && caller != "" {
 							setCaller(reqTrace, caller)
@@ -205,7 +205,7 @@ func GrpcInterceptor(
 		defer func() {
 			timecost := utils.CalTimecost(t0)
 			metrics.Observe(timecost, method)
-			xlog.Fatal("TIMECOST=%v", timecost)
+			//xlog.Fatal("TIMECOST=%v", timecost)
 			errType := ""
 			if err != nil {
 				errType = clients.ERR_ERR
