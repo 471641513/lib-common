@@ -26,7 +26,7 @@ func TestGrpcInterceptor(t *testing.T) {
 	middleware.InitRpcMetrics(m, "unitTest")
 
 	var ifunc func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (rsp interface{}, err error)
-	ifunc = middleware.GrpcInterceptor(m,
+	ifunc = middleware.GrpcInterceptor(*m,
 		middleware.OptEnsureTrace(func(req reflect.Type) middleware.TraceIface {
 			trace := &test_proto.Trace{}
 			return trace
