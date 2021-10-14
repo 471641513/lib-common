@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 )
 
 type CopyMap2EntityWrapper struct {

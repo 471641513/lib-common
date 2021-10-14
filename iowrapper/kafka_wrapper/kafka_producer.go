@@ -1,7 +1,7 @@
 package kafka_wrapper
 
 import (
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )

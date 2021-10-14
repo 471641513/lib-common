@@ -2,7 +2,7 @@ package beanstalkd
 
 import (
 	"context"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 	"sync"
 	"time"
 

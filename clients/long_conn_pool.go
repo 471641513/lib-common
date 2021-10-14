@@ -12,7 +12,7 @@ import (
 
 	"google.golang.org/grpc/keepalive"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"github.com/smallnest/weighted"
 

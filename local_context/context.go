@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/opay-org/lib-common/utils"
+	"github.com/xutils/lib-common/utils"
 )
 
 type LocalContext struct {

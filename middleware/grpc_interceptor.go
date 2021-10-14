@@ -9,17 +9,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/opay-org/lib-common/utils"
+	"github.com/xutils/lib-common/utils"
 
-	"github.com/opay-org/lib-common/clients"
+	"github.com/xutils/lib-common/clients"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/opay-org/lib-common/local_context"
-	"github.com/opay-org/lib-common/metrics"
+	"github.com/xutils/lib-common/local_context"
+	"github.com/xutils/lib-common/metrics"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )

@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/opay-org/lib-common/middleware"
+	"github.com/xutils/lib-common/middleware"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 )

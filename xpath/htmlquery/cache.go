@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/golang/groupcache/lru"
-	"github.com/opay-org/lib-common/xpath/xpath"
+	"github.com/xutils/lib-common/xpath/xpath"
 )
 
 // DisableSelectorCache will disable caching for the query selector if value is true.

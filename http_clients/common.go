@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/opay-org/lib-common/clients"
+	"github.com/xutils/lib-common/clients"
 
-	"github.com/opay-org/lib-common/local_context"
-	"github.com/opay-org/lib-common/metrics"
-	"github.com/opay-org/lib-common/utils"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/local_context"
+	"github.com/xutils/lib-common/metrics"
+	"github.com/xutils/lib-common/utils"
+	"github.com/xutils/lib-common/xlog"
 
 	jsoniter "github.com/json-iterator/go"
 )

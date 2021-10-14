@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/opay-org/lib-common/utils/obj_utils"
+	"github.com/xutils/lib-common/utils/obj_utils"
 
 	"github.com/jinzhu/gorm"
-	"github.com/opay-org/lib-common/local_context"
-	"github.com/opay-org/lib-common/utils"
+	"github.com/xutils/lib-common/local_context"
+	"github.com/xutils/lib-common/utils"
 )
 
 const maxLimit = 500

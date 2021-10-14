@@ -9,15 +9,15 @@ import (
 
 	"google.golang.org/grpc/codes"
 
-	"github.com/opay-org/lib-common/clients"
+	"github.com/xutils/lib-common/clients"
 	"google.golang.org/grpc/status"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/opay-org/lib-common/local_context"
+	"github.com/xutils/lib-common/local_context"
 
-	"github.com/opay-org/lib-common/http_clients"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/http_clients"
+	"github.com/xutils/lib-common/xlog"
 	"golang.org/x/net/context"
 )
 

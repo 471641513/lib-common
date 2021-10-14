@@ -3,7 +3,7 @@ package xpath_test
 import (
 	"fmt"
 
-	"github.com/opay-org/lib-common/xpath/xpath"
+	"github.com/xutils/lib-common/xpath/xpath"
 )
 
 // XPath package example.

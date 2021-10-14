@@ -3,7 +3,7 @@ package model
 import (
 	"testing"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )

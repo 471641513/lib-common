@@ -3,7 +3,7 @@ package obj_utils
 import (
 	"testing"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 	"github.com/stretchr/testify/assert"
 )
 

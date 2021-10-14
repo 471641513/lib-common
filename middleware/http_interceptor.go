@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/opay-org/lib-common/clients"
+	"github.com/xutils/lib-common/clients"
 
 	status2 "google.golang.org/grpc/status"
 
 	"google.golang.org/grpc/codes"
 
-	"github.com/opay-org/lib-common/local_context"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/local_context"
+	"github.com/xutils/lib-common/xlog"
 
 	"google.golang.org/genproto/googleapis/rpc/status"
 
@@ -22,7 +22,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/opay-org/lib-common/utils/json_rsp_unmarshal"
+	"github.com/xutils/lib-common/utils/json_rsp_unmarshal"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 

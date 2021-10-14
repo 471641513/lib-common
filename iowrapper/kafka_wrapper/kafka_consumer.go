@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/opay-org/lib-common/local_context"
-	"github.com/opay-org/lib-common/utils"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/local_context"
+	"github.com/xutils/lib-common/utils"
+	"github.com/xutils/lib-common/xlog"
 )
 
 type KafkaConsumerConfig struct {

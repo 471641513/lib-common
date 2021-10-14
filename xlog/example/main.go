@@ -1,7 +1,7 @@
 package main
 
 import (
-	logger "github.com/opay-org/lib-common/xlog"
+	logger "github.com/xutils/lib-common/xlog"
 
 	"time"
 )

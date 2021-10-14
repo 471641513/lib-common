@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/opay-org/lib-common/utils/obj_utils"
+	"github.com/xutils/lib-common/utils/obj_utils"
 
 	"github.com/jinzhu/gorm"
-	"github.com/opay-org/lib-common/iowrapper/model"
-	"github.com/opay-org/lib-common/iowrapper/redis_wrapper"
-	"github.com/opay-org/lib-common/local_context"
-	"github.com/opay-org/lib-common/utils"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/iowrapper/model"
+	"github.com/xutils/lib-common/iowrapper/redis_wrapper"
+	"github.com/xutils/lib-common/local_context"
+	"github.com/xutils/lib-common/utils"
+	"github.com/xutils/lib-common/xlog"
 	"github.com/stretchr/testify/assert"
 )
 

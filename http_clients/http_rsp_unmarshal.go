@@ -1,7 +1,7 @@
 package http_clients
 
 import (
-	"github.com/opay-org/lib-common/utils/json_rsp_unmarshal"
+	"github.com/xutils/lib-common/utils/json_rsp_unmarshal"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

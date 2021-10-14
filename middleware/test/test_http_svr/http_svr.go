@@ -8,14 +8,14 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/opay-org/lib-common/local_context"
+	"github.com/xutils/lib-common/local_context"
 
-	"github.com/opay-org/lib-common/metrics"
+	"github.com/xutils/lib-common/metrics"
 
-	"github.com/opay-org/lib-common/middleware"
+	"github.com/xutils/lib-common/middleware"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"

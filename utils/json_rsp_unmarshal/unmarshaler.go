@@ -3,7 +3,7 @@ package json_rsp_unmarshal
 import (
 	"fmt"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"github.com/golang/protobuf/ptypes/any"
 

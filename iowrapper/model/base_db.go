@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	"github.com/jinzhu/gorm"
 

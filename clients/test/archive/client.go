@@ -8,8 +8,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/opay-org/lib-common/clients"
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/clients"
+	"github.com/xutils/lib-common/xlog"
 )
 
 var clientCnt = flag.Int("c", 10, "routine cnt")

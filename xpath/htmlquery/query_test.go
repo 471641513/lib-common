@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/opay-org/lib-common/xpath/xpath"
+	"github.com/xutils/lib-common/xpath/xpath"
 
 	"golang.org/x/net/html"
 )

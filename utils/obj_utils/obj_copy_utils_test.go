@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/exp/rand"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 	"github.com/stretchr/testify/assert"
 )
 

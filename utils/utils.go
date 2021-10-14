@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 
 	jsoniter "github.com/json-iterator/go"
 )

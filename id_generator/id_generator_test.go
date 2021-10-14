@@ -1,7 +1,7 @@
 package id_generator
 
 import (
-	"github.com/opay-org/lib-common/xlog"
+	"github.com/xutils/lib-common/xlog"
 	"testing"
 )
 
